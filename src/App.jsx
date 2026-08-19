@@ -10,9 +10,9 @@ import ProductListPage from "./pages/admin/ProductListPage";
 import ProductFormPage from "./pages/admin/ProductFormPage";
 import MermasPage from "./pages/admin/MermasPage";
 import UsersPage from "./pages/admin/UsersPage";
-import MorePage from "./pages/admin/MorePage";
 import MercadoPagoConfigPage from "./pages/admin/MercadoPagoConfigPage";
 import ReportsPage from "./pages/admin/ReportsPage";
+import ProfilePage from "./pages/ProfilePage";
 import SalePage from "./pages/ventas/SalePage";
 import CheckoutPage from "./pages/ventas/CheckoutPage";
 import SalesHistoryPage from "./pages/ventas/SalesHistoryPage";
@@ -33,7 +33,6 @@ export default function App() {
         <Route element={<AuthenticatedLayout requireAdmin />}>
           <Route path="/admin" element={<DashboardPage />} />
           <Route path="/admin/informes" element={<ReportsPage />} />
-          <Route path="/admin/mas" element={<MorePage />} />
 
           <Route path="/admin/mantenedor" element={<MantenedorPage />} />
           <Route path="/admin/mantenedor/productos" element={<ProductListPage />} />
@@ -45,6 +44,7 @@ export default function App() {
         </Route>
 
         <Route element={<AuthenticatedLayout />}>
+          <Route path="/perfil" element={<ProfilePage />} />
           <Route path="/venta" element={<SalePage />} />
           <Route path="/venta/cobrar" element={<CheckoutPage />} />
           <Route path="/venta/historial" element={<SalesHistoryPage />} />
