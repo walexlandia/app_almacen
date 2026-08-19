@@ -5,6 +5,7 @@ import { useAuth } from "./context/AuthContext";
 
 import LoginPage from "./pages/auth/LoginPage";
 import DashboardPage from "./pages/admin/DashboardPage";
+import MantenedorPage from "./pages/admin/MantenedorPage";
 import ProductListPage from "./pages/admin/ProductListPage";
 import ProductFormPage from "./pages/admin/ProductFormPage";
 import MermasPage from "./pages/admin/MermasPage";
@@ -31,14 +32,16 @@ export default function App() {
 
         <Route element={<AuthenticatedLayout requireAdmin />}>
           <Route path="/admin" element={<DashboardPage />} />
-          <Route path="/admin/productos" element={<ProductListPage />} />
-          <Route path="/admin/productos/nuevo" element={<ProductFormPage />} />
-          <Route path="/admin/productos/:id" element={<ProductFormPage />} />
           <Route path="/admin/informes" element={<ReportsPage />} />
           <Route path="/admin/mas" element={<MorePage />} />
-          <Route path="/admin/mermas" element={<MermasPage />} />
-          <Route path="/admin/usuarios" element={<UsersPage />} />
-          <Route path="/admin/mercado-pago" element={<MercadoPagoConfigPage />} />
+
+          <Route path="/admin/mantenedor" element={<MantenedorPage />} />
+          <Route path="/admin/mantenedor/productos" element={<ProductListPage />} />
+          <Route path="/admin/mantenedor/productos/nuevo" element={<ProductFormPage />} />
+          <Route path="/admin/mantenedor/productos/:id" element={<ProductFormPage />} />
+          <Route path="/admin/mantenedor/mermas" element={<MermasPage />} />
+          <Route path="/admin/mantenedor/usuarios" element={<UsersPage />} />
+          <Route path="/admin/mantenedor/mercado-pago" element={<MercadoPagoConfigPage />} />
         </Route>
 
         <Route element={<AuthenticatedLayout />}>
