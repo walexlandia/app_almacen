@@ -1,10 +1,10 @@
 import { NavLink } from "react-router-dom";
-import { Home, Package, ScanBarcode, ClipboardList, BarChart3, MoreHorizontal } from "lucide-react";
+import { Home, Warehouse, ScanBarcode, ClipboardList, BarChart3, MoreHorizontal } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 const itemsAdmin = [
   { to: "/admin", label: "Inicio", icon: Home, end: true },
-  { to: "/admin/productos", label: "Productos", icon: Package },
+  { to: "/admin/mantenedor", label: "Mantenedor", icon: Warehouse },
   { to: "/admin/informes", label: "Informes", icon: BarChart3 },
   { to: "/admin/mas", label: "Más", icon: MoreHorizontal },
 ];
