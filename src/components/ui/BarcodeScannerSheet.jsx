@@ -62,3 +62,5 @@ export default function BarcodeScannerSheet({ open, onClose, onDetectado, produc
     </Sheet>
   );
 }
+
+// prueba para git 
