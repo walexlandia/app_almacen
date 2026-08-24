@@ -33,7 +33,7 @@ export default function ProductFormPage() {
     e.preventDefault();
     // Diseño sin datos: no persiste, solo confirma visualmente el flujo.
     setGuardado(true);
-    setTimeout(() => navigate("/admin/productos"), 900);
+    setTimeout(() => navigate("/admin/mantenedor/productos"), 900);
   };
 
   return (
@@ -164,7 +164,7 @@ export default function ProductFormPage() {
             className="flex-1"
             onClick={() => {
               setConfirmarBaja(false);
-              navigate("/admin/productos");
+              navigate("/admin/mantenedor/productos");
             }}
           >
             Dar de baja
