@@ -5,6 +5,7 @@ import { useCart } from "../../context/CartContext";
 import { formatoCLP } from "../../data/mockData";
 import TopBar from "../../components/layout/TopBar";
 import Button from "../../components/ui/Button";
+import { createPreference } from "../../services/mercadopago";
 
 const metodos = [
   { id: "efectivo", label: "Efectivo", icon: Banknote },
@@ -19,9 +20,27 @@ export default function CheckoutPage() {
 
   if (items.length === 0 && estado !== "listo") return <Navigate to="/venta" replace />;
 
-  const confirmar = () => {
+  const confirmar = async () => {
     setEstado("procesando");
+    if (metodo === "mercadopago") {
+    try {
+      const itemsForPreference = items.map((i) => ({
+        title: i.nombre ?? i.name ?? "Producto",
+        description: i.descripcion ?? i.description,
+        quantity: i.cantidad ?? i.quantity ?? 1,
+        unit_price: i.precio ?? i.price ?? 0,
+        currency_id: "ARS"
+      }));
+      const result = await createPreference(itemsForPreference, `order-${Date.now()}`);
+      window.location.href = result.init_point;
+    } catch (error) {
+      console.error(error);
+      alert("Error al iniciar el pago con Mercado Pago");
+      setEstado("pendiente");
+    }
+  } else {
     setTimeout(() => setEstado("listo"), 1200);
+  }
   };
 
   const finalizar = () => {
