@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pruebas de la integración Mercado Pago (túnel)</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 2rem auto; line-height: 1.5; }
+    .section { margin-top: 2rem; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; }
+    label { display: block; margin-top: 0.5rem; }
+    input, button, textarea { padding: 0.5rem; font-size: 1rem; }
+    button { margin-top: 0.5rem; }
+    .result { margin-top: 1rem; white-space: pre-wrap; background:#f9f9f9; padding:0.5rem; border:1px solid #ccc; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Pruebas de la API (a través del túnel)</h1>
+
+  <!-- URL base del túnel -->
+  <div class="section">
+    <h2>1️⃣ URL del túnel</h2>
+    <p>
+      Copia aquí la URL que <code>cloudflared tunnel --url http://localhost:3001</code> genera.
+      Por ejemplo: <code>https://hint-inner-like-administered.trycloudflare.com</code>
+    </p>
+    <label for="baseUrl">URL base:</label>
+    <input type="text" id="baseUrl" placeholder="https://..." style="width:100%;"/>
+  </div>
+
+  <!-- Health check -->
+  <div class="section">
+    <h2>2️⃣ Health‑check</h2>
+    <button id="healthBtn">Ejecutar /health</button>
+    <div id="healthResult" class="result"></div>
+  </div>
+
+  <!-- Crear pago -->
+  <div class="section">
+    <h2>3️⃣ Crear pago</h2>
+    <label for="amount">Monto (USD):</label>
+    <input type="number" id="amount" min="0.01" step="0.01" placeholder="10.00" style="width:100%;"/>
+    <button id="payBtn">Crear pago</button>
+    <div id="payResult" class="result"></div>
+  </div>
+
+  <!-- Simular webhook -->
+  <div class="section">
+    <h2>4️⃣ Simular webhook</h2>
+    <p>Se enviará un payload de ejemplo al endpoint <code>/api/payments/webhook</code>.</p>
+    <button id="webhookBtn">Enviar webhook de prueba</button>
+    <div id="webhookResult" class="result"></div>
+  </div>
+
+  <script>
+    // Helpers ----------------------------------------------------------
+    const getBase = () => document.getElementById('baseUrl').value.trim().replace(/\/+$/,'');
+    const show = (el, content, isError=false) => {
+      el.textContent = '';
+      if (isError) { el.classList.add('error'); }
+      else { el.classList.remove('error'); }
+      el.textContent = content;
+    };
+
+    // 1️⃣ Health check -------------------------------------------------
+    document.getElementById('healthBtn').addEventListener('click', async () => {
+      const resultEl = document.getElementById('healthResult');
+      const base = getBase();
+      if (!base) return show(resultEl, 'Introduce la URL del túnel primero.', true);
+      try {
+        const resp = await fetch(`${base}/health`);
+        const data = await resp.json();
+        show(resultEl, JSON.stringify(data, null, 2));
+      } catch (e) {
+        show(resultEl, `Error: ${e.message}`, true);
+      }
+    });
+
+    // 2️⃣ Crear pago ---------------------------------------------------
+    document.getElementById('payBtn').addEventListener('click', async () => {
+      const resultEl = document.getElementById('payResult');
+      const base = getBase();
+      const amount = parseFloat(document.getElementById('amount').value);
+      if (!base) return show(resultEl, 'Introduce la URL del túnel primero.', true);
+      if (!amount || amount <= 0) return show(resultEl, 'Introduce un monto válido.', true);
+      try {
+        const resp = await fetch(`${base}/api/payments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount, description: 'Prueba desde HTML' })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Error al crear el pago');
+        show(resultEl, JSON.stringify(data, null, 2));
+      } catch (e) {
+        show(resultEl, `Error: ${e.message}`, true);
+      }
+    });
+
+    // 3️⃣ Simular webhook -----------------------------------------------
+    const sampleWebhook = {
+      type: "order",
+      action: "order.processed",
+      api_version: "v1",
+      application_id: "2342717626972750",
+      data: {
+        external_reference: "ext_ref_1234",
+        id: "123456",
+        status: "processed",
+        status_detail: "accredited",
+        total_paid_amount: 100000,
+        transactions: {
+          payments: [{
+            amount: 100000,
+            id: "PAY01K7S9596QBWZRTY02NF",
+            paid_amount: 100000,
+            payment_method: { id: "visa", installments: 1, type: "credit_card" },
+            reference: { id: 1234567891 },
+            status: "processed",
+            status_detail: "accredited"
+          }]
+        },
+        type: "point",
+        version: 3
+      },
+      date_created: "2021-11-01T02:02:02-04:00",
+      live_mode: true,
+      user_id: 3620938896
+    };
+
+    document.getElementById('webhookBtn').addEventListener('click', async () => {
+      const resultEl = document.getElementById('webhookResult');
+      const base = getBase();
+      if (!base) return show(resultEl, 'Introduce la URL del túnel primero.', true);
+      try {
+        const resp = await fetch(`${base}/api/payments/webhook`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sampleWebhook)
+        });
+        const data = await resp.json();
+        show(resultEl, JSON.stringify(data, null, 2));
+      } catch (e) {
+        show(resultEl, `Error: ${e.message}`, true);
+      }
+    });
+  </script>
+</body>
+</html>

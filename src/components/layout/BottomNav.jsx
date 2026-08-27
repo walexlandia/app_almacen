@@ -1,18 +1,17 @@
 import { NavLink } from "react-router-dom";
-import { Home, Warehouse, ScanBarcode, ClipboardList, BarChart3, CircleUser } from "lucide-react";
+import { Home, Package, ScanBarcode, ClipboardList, BarChart3, MoreHorizontal } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 const itemsAdmin = [
   { to: "/admin", label: "Inicio", icon: Home, end: true },
-  { to: "/admin/mantenedor", label: "Mantenedor", icon: Warehouse },
+  { to: "/admin/productos", label: "Productos", icon: Package },
   { to: "/admin/informes", label: "Informes", icon: BarChart3 },
-  { to: "/perfil", label: "Perfil", icon: CircleUser },
+  { to: "/admin/mas", label: "Más", icon: MoreHorizontal },
 ];
 
 const itemsVendedor = [
   { to: "/venta", label: "Vender", icon: ScanBarcode, end: true },
   { to: "/venta/historial", label: "Historial", icon: ClipboardList },
-  { to: "/perfil", label: "Perfil", icon: CircleUser },
 ];
 
 export default function BottomNav() {

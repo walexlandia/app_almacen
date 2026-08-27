@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mercado Pago — Consola de pruebas</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #121821;
+    --panel-2: #171f2b;
+    --border: #253143;
+    --text: #e7ecf3;
+    --text-dim: #8b98ab;
+    --accent: #45b9ff;
+    --accent-ink: #04212f;
+    --ok: #35d68e;
+    --ok-ink: #06301f;
+    --warn: #f5b942;
+    --warn-ink: #3a2703;
+    --err: #ff5c6c;
+    --err-ink: #350a0d;
+    --mono: ui-monospace, "SF Mono", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.5;
+    padding-bottom: 4rem;
+  }
+  header {
+    padding: 1.5rem 1.25rem 1rem;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #0e1420, var(--bg));
+  }
+  header h1 {
+    margin: 0 0 0.15rem;
+    font-size: 1.35rem;
+    letter-spacing: -0.01em;
+  }
+  header p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.1rem;
+  }
+  .card h2 {
+    margin: 0 0 0.15rem;
+    font-size: 1.02rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .card .desc {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin: 0 0 0.9rem;
+  }
+  .row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
+  .field { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; min-width: 140px; }
+  .field label { font-size: 0.75rem; color: var(--text-dim); }
+  input, select {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 0.55rem 0.65rem;
+    font-size: 0.92rem;
+    font-family: var(--sans);
+    width: 100%;
+  }
+  input:focus, select:focus, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  button {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text);
+    padding: 0.6rem 0.95rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #06202e; }
+  button.danger { background: transparent; border-color: var(--err); color: var(--err); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  button:not(:disabled):active { transform: translateY(1px); }
+  .stack { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.9rem; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .pill.ok { background: var(--ok-ink); color: var(--ok); }
+  .pill.warn { background: var(--warn-ink); color: var(--warn); }
+  .pill.err { background: var(--err-ink); color: var(--err); }
+  .pill.neutral { background: var(--panel-2); color: var(--text-dim); border: 1px solid var(--border); }
+  .result { border: 1px dashed var(--border); border-radius: 10px; padding: 0.8rem; font-size: 0.87rem; }
+  .result:empty { display: none; }
+  .result .row { justify-content: space-between; }
+  .qr-img { display: block; margin: 0.6rem auto; width: 220px; height: 220px; border-radius: 10px; background: #fff; padding: 8px; }
+  .muted { color: var(--text-dim); font-size: 0.8rem; }
+  code { font-family: var(--mono); background: var(--panel-2); padding: 0.1rem 0.35rem; border-radius: 5px; font-size: 0.85em; }
+  .checklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.87rem; }
+  .checklist li { display: flex; align-items: center; gap: 0.5rem; }
+  .banner {
+    border-radius: 10px;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.85rem;
+    border: 1px solid var(--border);
+    margin-top: 0.75rem;
+  }
+  .banner.warn { background: var(--warn-ink); border-color: #6b4e0f; color: var(--warn); }
+  .banner.err { background: var(--err-ink); border-color: #6b1a22; color: var(--err); }
+  details.log summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.3rem 0;
+  }
+  .log-entries { display: flex; flex-direction: column-reverse; gap: 0.5rem; margin-top: 0.6rem; max-height: 420px; overflow-y: auto; }
+  .log-entry { border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.7rem; }
+  .log-entry .head { display: flex; justify-content: space-between; gap: 0.5rem; font-size: 0.78rem; color: var(--text-dim); margin-bottom: 0.3rem; }
+  .log-entry pre { margin: 0; white-space: pre-wrap; word-break: break-word; font-family: var(--mono); font-size: 0.76rem; }
+  .divider { height: 1px; background: var(--border); margin: 0.9rem 0; border: none; }
+  a { color: var(--accent); }
+  @media (max-width: 480px) {
+    .qr-img { width: 180px; height: 180px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧾 Mercado Pago — Consola de pruebas</h1>
+  <p>QR, Point / Smart Point, Checkout Pro y webhooks — todo contra tu backend de <code>server/</code>.</p>
+</header>
+
+<main>
+
+  <!-- ===================== PREFLIGHT ===================== -->
+  <section class="card" id="preflight">
+    <h2>⚙️ Conexión al servidor</h2>
+    <p class="desc">Confirmá que el backend está corriendo y qué te falta configurar antes de probar.</p>
+    <div class="row">
+      <div class="field" style="flex:2">
+        <label for="baseUrl">URL del backend</label>
+        <input id="baseUrl" value="http://localhost:3001" />
+      </div>
+      <button class="primary" id="btnHealth" style="align-self:flex-end">Comprobar</button>
+    </div>
+    <div class="stack" id="preflightResult"></div>
+  </section>
+
+  <!-- ===================== QR ===================== -->
+  <section class="card" id="qr">
+    <h2>📱 Cobrar con QR</h2>
+    <p class="desc">Genera un código QR dinámico por el monto exacto de la venta.</p>
+    <div class="row">
+      <div class="field">
+        <label for="qrAmount">Monto (CLP)</label>
+        <input id="qrAmount" type="number" min="1" step="1" placeholder="1800" />
+      </div>
+      <div class="field">
+        <label for="qrDesc">Descripción</label>
+        <input id="qrDesc" value="Venta almacén" />
+      </div>
+    </div>
+    <div class="row" style="margin-top:0.7rem">
+      <button class="primary" id="btnQrCreate">Generar código QR</button>
+      <button id="btnQrRefresh" disabled>Actualizar estado</button>
+    </div>
+    <div class="result" id="qrResult"></div>
+  </section>
+
+  <!-- ===================== POINT ===================== -->
+  <section class="card" id="point">
+    <h2>💳 Cobrar con Point / Smart Point</h2>
+    <p class="desc">Envía el monto a una terminal Point vinculada a tu cuenta.</p>
+    <div class="row">
+      <button id="btnPointTerminals">Buscar terminales</button>
+      <div class="field" style="flex:2">
+        <label for="pointTerminal">Terminal</label>
+        <select id="pointTerminal"><option value="">— buscá terminales primero —</option></select>
+      </div>
+    </div>
+    <div class="row" style="margin-top:0.6rem">
+      <div class="field">
+        <label for="pointAmount">Monto (CLP)</label>
+        <input id="pointAmount" type="number" min="1" step="1" placeholder="1800" />
+      </div>
+      <div class="field">
+        <label for="pointDesc">Descripción</label>
+        <input id="pointDesc" value="Venta almacén" />
+      </div>
+    </div>
+    <div class="row" style="margin-top:0.7rem">
+      <button class="primary" id="btnPointCreate">Enviar cobro a la terminal</button>
+      <button id="btnPointRefresh" disabled>Actualizar estado</button>
+      <button class="danger" id="btnPointCancel" disabled>Cancelar</button>
+    </div>
+    <div class="row" style="margin-top:0.4rem">
+      <button id="btnSimOk" disabled>✅ Simular aprobado</button>
+      <button id="btnSimFail" disabled>❌ Simular rechazado</button>
+    </div>
+    <p class="muted">Simular solo funciona con credenciales de prueba (<code>TEST-...</code>) — con credenciales de producción, Mercado Pago lo rechaza a propósito.</p>
+    <div class="result" id="pointResult"></div>
+  </section>
+
+  <!-- ===================== CHECKOUT PRO (legacy) ===================== -->
+  <section class="card" id="checkout">
+    <h2>🔗 Checkout Pro <span class="pill neutral">ya existía</span></h2>
+    <p class="desc">El checkout con redirección que ya estaba integrado. Sigue funcionando igual.</p>
+    <div class="row">
+      <div class="field">
+        <label for="cpAmount">Monto</label>
+        <input id="cpAmount" type="number" min="1" step="1" placeholder="1800" />
+      </div>
+      <div class="field">
+        <label for="cpDesc">Descripción</label>
+        <input id="cpDesc" value="Venta almacén" />
+      </div>
+      <button class="primary" id="btnCpCreate" style="align-self:flex-end">Crear preferencia</button>
+    </div>
+    <div class="result" id="cpResult"></div>
+  </section>
+
+  <!-- ===================== WEBHOOK ===================== -->
+  <section class="card" id="webhook">
+    <h2>🔔 Simular webhooks</h2>
+    <p class="desc">Manda notificaciones de ejemplo a tu propio <code>/api/payments/webhook</code>, sin depender de que Mercado Pago te avise de verdad.</p>
+    <div class="row">
+      <button id="btnWhQr">Notificación QR</button>
+      <button id="btnWhPoint">Notificación Point</button>
+      <button id="btnWhOnline">Notificación Checkout</button>
+    </div>
+    <p class="muted">
+      Point y Checkout van firmadas con <code>MP_WEBHOOK_SECRET</code> real; si lo configuraste en <code>server/.env</code>,
+      esta simulación (sin firma real) debería volver <strong>401</strong> — eso confirma que la validación funciona.
+      Si no lo configuraste, vuelve <strong>200</strong> con una advertencia en la consola del servidor.
+      La notificación QR nunca va firmada (así es como la manda Mercado Pago), así que siempre vuelve <strong>200</strong>.
+    </p>
+    <div class="result" id="whResult"></div>
+  </section>
+
+  <!-- ===================== LOG ===================== -->
+  <section class="card">
+    <details class="log">
+      <summary>🪵 Historial de peticiones (respuestas crudas)</summary>
+      <div class="log-entries" id="logEntries"></div>
+    </details>
+  </section>
+
+</main>
+
+<script>
+  // ---------- helpers ----------
+  const $ = (id) => document.getElementById(id);
+  const getBase = () => $('baseUrl').value.trim().replace(/\/+$/, '');
+
+  function logEntry(title, ok, payload) {
+    const wrap = document.createElement('div');
+    wrap.className = 'log-entry';
+    const time = new Date().toLocaleTimeString('es-CL');
+    wrap.innerHTML = `<div class="head"><span>${ok ? '✅' : '❌'} ${title}</span><span>${time}</span></div><pre></pre>`;
+    wrap.querySelector('pre').textContent = typeof payload === 'string' ? payload : JSON.stringify(payload, null, 2);
+    $('logEntries').appendChild(wrap);
+  }
+
+  async function api(method, path, body) {
+    const base = getBase();
+    if (!base) throw new Error('Completá la URL del backend primero.');
+    let res, data;
+    try {
+      res = await fetch(base + path, {
+        method,
+        headers: body !== undefined ? { 'Content-Type': 'application/json' } : undefined,
+        body: body !== undefined ? JSON.stringify(body) : undefined,
+      });
+    } catch (networkErr) {
+      logEntry(`${method} ${path}`, false, `No se pudo conectar a ${base}. ¿Está corriendo "npm run dev" en server/? (${networkErr.message})`);
+      throw networkErr;
+    }
+    try { data = await res.json(); } catch { data = {}; }
+    logEntry(`${method} ${path} → HTTP ${res.status}`, res.ok, data);
+    if (!res.ok) {
+      const err = new Error(data.error || `HTTP ${res.status}`);
+      err.data = data;
+      err.status = res.status;
+      throw err;
+    }
+    return data;
+  }
+
+  function pill(text, tone) {
+    return `<span class="pill ${tone}">${text}</span>`;
+  }
+
+  function statusTone(status) {
+    if (['processed', 'approved', 'accredited'].includes(status)) return 'ok';
+    if (['cancelled', 'expired', 'rejected', 'failed', 'refunded'].includes(status)) return 'err';
+    if (['created', 'at_terminal', 'action_required', 'pending', 'in_process'].includes(status)) return 'warn';
+    return 'neutral';
+  }
+
+  function isTerminalStatus(status) {
+    return ['processed', 'cancelled', 'expired', 'rejected', 'failed', 'refunded'].includes(status);
+  }
+
+  function setBusy(btn, busy, busyLabel) {
+    if (busy) { btn.dataset.label = btn.textContent; btn.textContent = busyLabel || 'Un momento…'; btn.disabled = true; }
+    else { btn.textContent = btn.dataset.label || btn.textContent; btn.disabled = false; }
+  }
+
+  // ---------- preflight ----------
+  async function runHealth() {
+    const box = $('preflightResult');
+    box.innerHTML = '<p class="muted">Comprobando…</p>';
+    try {
+      const h = await api('GET', '/health');
+      const modeTone = h.mpMode === 'production' ? 'err' : h.mpMode === 'test' ? 'ok' : 'warn';
+      const modeLabel = h.mpMode === 'production' ? 'PRODUCCIÓN — los cobros son reales' : h.mpMode === 'test' ? 'prueba (TEST-…)' : 'sin configurar';
+      box.innerHTML = `
+        <ul class="checklist">
+          <li>${pill('conectado', 'ok')} Servidor respondiendo en ${getBase()}</li>
+          <li>${pill(h.mpMode, modeTone)} Modo: ${modeLabel}</li>
+          <li>${pill(h.qrConfigured ? 'listo' : 'falta', h.qrConfigured ? 'ok' : 'warn')} QR ${h.qrConfigured ? 'tiene POS configurado' : '— corré <code>npm run setup:qr</code> en server/'}</li>
+          <li>${pill(h.pointTerminalConfigured ? 'con default' : 'opcional', h.pointTerminalConfigured ? 'ok' : 'neutral')} Point ${h.pointTerminalConfigured ? 'tiene terminal por defecto' : '— podés elegir la terminal a mano abajo'}</li>
+          <li>${pill(h.webhookSecretConfigured ? 'validando' : 'sin validar', h.webhookSecretConfigured ? 'ok' : 'warn')} Webhook ${h.webhookSecretConfigured ? 'valida firma' : '— configurá MP_WEBHOOK_SECRET para producción'}</li>
+        </ul>
+        ${h.mpMode === 'production' ? '<div class="banner err">⚠️ Access Token de producción: cualquier QR escaneado o cobro enviado a la terminal mueve plata real. Para probar sin riesgo, usá credenciales TEST- en server/.env.</div>' : ''}
+      `;
+    } catch (e) {
+      box.innerHTML = `<div class="banner err">${e.message}</div>`;
+    }
+  }
+  $('btnHealth').addEventListener('click', runHealth);
+
+  // ---------- QR ----------
+  let qrOrderId = null;
+  let qrPollTimer = null;
+
+  function stopQrPoll() { clearInterval(qrPollTimer); qrPollTimer = null; }
+
+  async function refreshQrStatus() {
+    if (!qrOrderId) return;
+    try {
+      const o = await api('GET', `/api/payments/orders/${qrOrderId}`);
+      const box = $('qrResult');
+      const badge = box.querySelector('#qrStatusPill');
+      if (badge) { badge.outerHTML = `<span id="qrStatusPill">${pill(o.status, statusTone(o.status))}</span>`; }
+      if (isTerminalStatus(o.status)) stopQrPoll();
+    } catch { /* ya quedó logueado */ }
+  }
+
+  $('btnQrCreate').addEventListener('click', async () => {
+    const amount = Number($('qrAmount').value);
+    const description = $('qrDesc').value || 'Venta almacén';
+    if (!amount || amount <= 0) { $('qrResult').innerHTML = '<div class="banner warn">Ingresá un monto válido.</div>'; return; }
+    stopQrPoll();
+    setBusy($('btnQrCreate'), true, 'Generando…');
+    try {
+      const o = await api('POST', '/api/payments/qr', { amount, description });
+      qrOrderId = o.orderId;
+      $('qrResult').innerHTML = `
+        ${o.qrImage ? `<img class="qr-img" src="${o.qrImage}" alt="Código QR" />` : ''}
+        <div class="row"><span>Orden</span><code>${o.orderId}</code></div>
+        <div class="row"><span>Estado</span><span id="qrStatusPill">${pill(o.status, statusTone(o.status))}</span></div>
+        <div class="row"><span>Monto</span><span>$${o.totalAmount}</span></div>
+        <div class="row"><span>Vence en</span><span>${o.expiresIn}</span></div>
+        <p class="muted">Escaneá el código con la app de Mercado Pago (con un usuario de prueba si tu backend está en modo TEST) para completar el pago.</p>
+      `;
+      $('btnQrRefresh').disabled = false;
+      qrPollTimer = setInterval(refreshQrStatus, 3000);
+    } catch (e) {
+      $('qrResult').innerHTML = `<div class="banner err">${e.message}${e.data?.details ? '<br><code>' + JSON.stringify(e.data.details) + '</code>' : ''}</div>`;
+    } finally {
+      setBusy($('btnQrCreate'), false);
+    }
+  });
+  $('btnQrRefresh').addEventListener('click', refreshQrStatus);
+
+  // ---------- Point ----------
+  let pointOrderId = null;
+  let pointPollTimer = null;
+
+  function stopPointPoll() { clearInterval(pointPollTimer); pointPollTimer = null; }
+
+  function renderPointStatus(o) {
+    $('pointResult').innerHTML = `
+      <div class="row"><span>Orden</span><code>${o.orderId}</code></div>
+      <div class="row"><span>Estado</span><span id="pointStatusPill">${pill(o.status, statusTone(o.status))}</span></div>
+      <div class="row"><span>Terminal</span><code>${o.terminalId || o.transactions?.payments?.[0]?.payment_method?.id || '—'}</code></div>
+    `;
+  }
+
+  async function refreshPointStatus() {
+    if (!pointOrderId) return;
+    try {
+      const o = await api('GET', `/api/payments/orders/${pointOrderId}`);
+      const badge = document.getElementById('pointStatusPill');
+      if (badge) badge.outerHTML = `<span id="pointStatusPill">${pill(o.status, statusTone(o.status))}</span>`;
+      if (isTerminalStatus(o.status)) stopPointPoll();
+    } catch { /* ya quedó logueado */ }
+  }
+
+  $('btnPointTerminals').addEventListener('click', async () => {
+    setBusy($('btnPointTerminals'), true, 'Buscando…');
+    try {
+      const resp = await api('GET', '/api/payments/point/terminals');
+      const terminals = resp?.data?.terminals || [];
+      const select = $('pointTerminal');
+      if (terminals.length === 0) {
+        select.innerHTML = '<option value="">Sin terminales — revisá que la Point esté encendida y vinculada</option>';
+      } else {
+        select.innerHTML = terminals
+          .map((t) => `<option value="${t.id}">${t.id} · POS ${t.pos_id} · ${t.operating_mode}</option>`)
+          .join('');
+      }
+    } catch (e) {
+      $('pointResult').innerHTML = `<div class="banner err">${e.message}</div>`;
+    } finally {
+      setBusy($('btnPointTerminals'), false);
+    }
+  });
+
+  $('btnPointCreate').addEventListener('click', async () => {
+    const amount = Number($('pointAmount').value);
+    const description = $('pointDesc').value || 'Venta almacén';
+    const terminal_id = $('pointTerminal').value || undefined;
+    if (!amount || amount <= 0) { $('pointResult').innerHTML = '<div class="banner warn">Ingresá un monto válido.</div>'; return; }
+    stopPointPoll();
+    setBusy($('btnPointCreate'), true, 'Enviando…');
+    try {
+      const o = await api('POST', '/api/payments/point', { amount, description, terminal_id });
+      pointOrderId = o.orderId;
+      renderPointStatus(o);
+      ['btnPointRefresh', 'btnPointCancel', 'btnSimOk', 'btnSimFail'].forEach((id) => ($(id).disabled = false));
+      pointPollTimer = setInterval(refreshPointStatus, 3000);
+    } catch (e) {
+      $('pointResult').innerHTML = `<div class="banner err">${e.message}${e.data?.details ? '<br><code>' + JSON.stringify(e.data.details) + '</code>' : ''}</div>`;
+    } finally {
+      setBusy($('btnPointCreate'), false);
+    }
+  });
+
+  $('btnPointRefresh').addEventListener('click', refreshPointStatus);
+
+  $('btnPointCancel').addEventListener('click', async () => {
+    if (!pointOrderId) return;
+    try {
+      const o = await api('POST', `/api/payments/point/${pointOrderId}/cancel`);
+      const badge = document.getElementById('pointStatusPill');
+      if (badge) badge.outerHTML = `<span id="pointStatusPill">${pill(o.status, statusTone(o.status))}</span>`;
+      stopPointPoll();
+    } catch { /* ya quedó logueado */ }
+  });
+
+  async function simulatePoint(status, statusDetail) {
+    if (!pointOrderId) return;
+    try {
+      await api('POST', `/api/payments/orders/${pointOrderId}/simulate`, { status, status_detail: statusDetail });
+      if (!pointPollTimer) pointPollTimer = setInterval(refreshPointStatus, 3000);
+      setTimeout(refreshPointStatus, 1200);
+    } catch { /* ya quedó logueado; probablemente credenciales de producción */ }
+  }
+  $('btnSimOk').addEventListener('click', () => simulatePoint('processed', 'accredited'));
+  $('btnSimFail').addEventListener('click', () => simulatePoint('failed', 'cc_rejected_other_reason'));
+
+  // ---------- Checkout Pro ----------
+  $('btnCpCreate').addEventListener('click', async () => {
+    const amount = Number($('cpAmount').value);
+    const description = $('cpDesc').value || 'Venta almacén';
+    if (!amount || amount <= 0) { $('cpResult').innerHTML = '<div class="banner warn">Ingresá un monto válido.</div>'; return; }
+    setBusy($('btnCpCreate'), true, 'Creando…');
+    try {
+      const o = await api('POST', '/api/payments', { amount, description });
+      $('cpResult').innerHTML = `
+        <div class="row"><span>ID de preferencia</span><code>${o.id}</code></div>
+        <p><a href="${o.init_point}" target="_blank" rel="noopener">Abrir checkout de Mercado Pago →</a></p>
+      `;
+    } catch (e) {
+      $('cpResult').innerHTML = `<div class="banner err">${e.message}</div>`;
+    } finally {
+      setBusy($('btnCpCreate'), false);
+    }
+  });
+
+  // ---------- Webhook simulator ----------
+  const samples = {
+    qr: { type: 'order', action: 'order.processed', data: { id: 'ORD_SIM_QR_0001', type: 'qr', status: 'processed' } },
+    point: { type: 'order', action: 'order.processed', data: { id: 'ORD_SIM_POINT_0001', type: 'point', status: 'processed' } },
+    online: { type: 'order', action: 'order.processed', data: { id: 'ORD_SIM_ONLINE_0001', type: 'online', status: 'processed' } },
+  };
+
+  async function sendSampleWebhook(kind) {
+    const sample = samples[kind];
+    const box = $('whResult');
+    const base = getBase();
+    try {
+      const res = await fetch(`${base}/api/payments/webhook?data.id=${sample.data.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sample),
+      });
+      const data = await res.json().catch(() => ({}));
+      logEntry(`POST /api/payments/webhook (${kind}) → HTTP ${res.status}`, res.ok, data);
+      box.innerHTML = `<div class="row"><span>Resultado (${kind})</span>${pill('HTTP ' + res.status, res.ok ? 'ok' : (res.status === 401 ? 'warn' : 'err'))}</div>`;
+    } catch (e) {
+      box.innerHTML = `<div class="banner err">${e.message}</div>`;
+    }
+  }
+  $('btnWhQr').addEventListener('click', () => sendSampleWebhook('qr'));
+  $('btnWhPoint').addEventListener('click', () => sendSampleWebhook('point'));
+  $('btnWhOnline').addEventListener('click', () => sendSampleWebhook('online'));
+
+  // ---------- init ----------
+  runHealth();
+</script>
+
+</body>
+</html>

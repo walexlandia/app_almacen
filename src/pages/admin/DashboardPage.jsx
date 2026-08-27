@@ -41,7 +41,7 @@ export default function DashboardPage() {
           <section>
             <div className="mb-2 flex items-center justify-between">
               <h2 className="text-[15px] font-semibold text-ink-900">Alertas de stock crítico</h2>
-              <Link to="/admin/mantenedor/productos?filtro=critico" className="text-sm font-medium text-brand-600">
+              <Link to="/admin/productos?filtro=critico" className="text-sm font-medium text-brand-600">
                 Ver todo
               </Link>
             </div>
