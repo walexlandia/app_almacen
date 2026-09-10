@@ -31,7 +31,7 @@ export default function ProductListPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <TopBar title="Productos" subtitle={`${productos.length} en catálogo`} onBack={null} />
+      <TopBar title="Productos" subtitle={`${productos.length} en catálogo`} />
 
       <div className="flex flex-col gap-3 px-5 py-4">
         <div className="relative">
@@ -100,7 +100,7 @@ export default function ProductListPage() {
               return (
                 <button
                   key={p.id}
-                  onClick={() => navigate(`/admin/productos/${p.id}`)}
+                  onClick={() => navigate(`/admin/mantenedor/productos/${p.id}`)}
                   className="flex items-center gap-3 rounded-2xl border border-ink-200 bg-white px-4 py-3 text-left active:bg-ink-50"
                 >
                   <div className="min-w-0 flex-1">
@@ -121,14 +121,14 @@ export default function ProductListPage() {
       <div className="pointer-events-none absolute inset-x-0 bottom-20 flex justify-end px-5">
         <div className="pointer-events-auto flex gap-2">
           <button
-            onClick={() => navigate("/admin/productos/nuevo?scan=1")}
+            onClick={() => navigate("/admin/mantenedor/productos/nuevo?scan=1")}
             className="flex size-12 items-center justify-center rounded-full bg-white text-ink-700 shadow-lg shadow-ink-900/10 ring-1 ring-ink-200 active:bg-ink-50"
             aria-label="Escanear producto"
           >
             <ScanLine size={20} />
           </button>
           <button
-            onClick={() => navigate("/admin/productos/nuevo")}
+            onClick={() => navigate("/admin/mantenedor/productos/nuevo")}
             className="flex h-12 items-center gap-2 rounded-full bg-brand-500 px-5 text-sm font-semibold text-white shadow-lg shadow-brand-500/30 active:bg-brand-600"
           >
             <Plus size={18} /> Producto
