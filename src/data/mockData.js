@@ -184,7 +184,7 @@ export const ventas = [
     fecha: "2026-08-19T10:15:00",
     vendedor: "Pedro Soto",
     estado: "completada",
-    metodoPago: "Mercado Pago",
+    metodoPago: "Efectivo",
     items: [
       { productoId: "p1", cantidad: 2, precioUnit: 1800 },
       { productoId: "p3", cantidad: 3, precioUnit: 700 },
@@ -215,7 +215,7 @@ export const ventas = [
     fecha: "2026-08-18T16:20:00",
     vendedor: "Pedro Soto",
     estado: "completada",
-    metodoPago: "Mercado Pago",
+    metodoPago: "Efectivo",
     items: [
       { productoId: "p2", cantidad: 6, precioUnit: 900 },
       { productoId: "p4", cantidad: 2, precioUnit: 1200 },

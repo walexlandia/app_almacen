@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
-import { Banknote, CreditCard, CheckCircle2 } from "lucide-react";
+import { Banknote, CheckCircle2 } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useData } from "../../context/DataContext";
@@ -8,17 +8,14 @@ import { formatoCLP } from "../../data/mockData";
 import TopBar from "../../components/layout/TopBar";
 import Button from "../../components/ui/Button";
 
-const metodos = [
-  { id: "efectivo", label: "Efectivo", icon: Banknote },
-  { id: "mercadopago", label: "Mercado Pago", icon: CreditCard },
-];
+const metodos = [{ id: "efectivo", label: "Efectivo", icon: Banknote }];
 
 export default function CheckoutPage() {
   const { items, total, vaciarCarrito } = useCart();
   const { usuario } = useAuth();
   const { registrarVenta } = useData();
   const navigate = useNavigate();
-  const [metodo, setMetodo] = useState("mercadopago");
+  const [metodo, setMetodo] = useState("efectivo");
   const [estado, setEstado] = useState("pendiente"); // pendiente | procesando | listo
   const [error, setError] = useState("");
 
@@ -79,7 +76,7 @@ export default function CheckoutPage() {
 
         <div>
           <p className="mb-2 text-sm font-medium text-ink-700">Método de pago</p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             {metodos.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
@@ -96,13 +93,6 @@ export default function CheckoutPage() {
             ))}
           </div>
         </div>
-
-        {metodo === "mercadopago" && (
-          <p className="text-xs text-ink-400">
-            Se abrirá el checkout de Mercado Pago para completar el cobro (integración real en{" "}
-            <code className="rounded bg-ink-100 px-1 py-0.5">feature/modulo1-mercadopago</code>).
-          </p>
-        )}
 
         {error && <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
 

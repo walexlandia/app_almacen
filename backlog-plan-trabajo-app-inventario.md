@@ -55,7 +55,7 @@ Estimación en Story Points (SP), escala Fibonacci: 1, 2, 3, 5, 8, 13
 | M1-05 | Como administrador, quiero recibir una alerta cuando un producto llegue a stock crítico, para reponerlo a tiempo.             | - Definición de umbral de stock crítico por producto.<br>- Indicador visual (color/ícono) en el listado.<br>- Notificación o sección dedicada a productos críticos.           | 🔴        | 5   |
 | M1-06 | Como administrador, quiero gestionar usuarios del sistema (crear, editar, desactivar), para controlar quién accede a la app.  | - CRUD de usuarios.<br>- Asignación de rol (admin/vendedor).<br>- Validación de correo/usuario único.                                                                         | 🔴        | 5   |
 | M1-07 | Como administrador, quiero registrar mermas de productos, para reflejar pérdidas por daño, vencimiento u otra causa.          | - Formulario de merma: producto, cantidad, motivo, fecha.<br>- Descuento automático del stock al registrar.<br>- Historial de mermas consultable.                             | 🟡        | 5   |
-| M1-08 | Como administrador, quiero integrar Mercado Pago como medio de pago, para procesar cobros desde la app.                       | - Conexión con API/checkout de Mercado Pago.<br>- Confirmación de pago exitoso/fallido.<br>- Asociación del pago a la venta correspondiente.                                  | 🔴        | 8   |
+| M1-08 | ~~Integración con un proveedor de pagos externo.~~ **Fuera de alcance por decisión del proyecto.**                          | No se incluye en la aplicación ni en sus pruebas funcionales.                                                                                                                 | ⛔        | 0   |
 
 ---
 
@@ -79,7 +79,7 @@ Estimación en Story Points (SP), escala Fibonacci: 1, 2, 3, 5, 8, 13
 | M3-02 | Como administrador, quiero ver las ventas del día, para conocer el rendimiento diario del negocio.             | - Listado de ventas del día actual.<br>- Total vendido y cantidad de transacciones.      | 🔴        | 3   |
 | M3-03 | Como administrador, quiero ver los productos más vendidos, para tomar decisiones de compra e inventario.       | - Ranking de productos por cantidad vendida.<br>- Filtro por rango de fechas (opcional). | 🟡        | 5   |
 
-**Total estimado del backlog:** 78 SP (referencial, ajustar según velocidad real del equipo)
+**Total estimado vigente del backlog:** 70 SP (M1-08 fue retirado del alcance).
 
 ---
 
@@ -157,10 +157,10 @@ Se propone un plan de **4 sprints de 2 semanas** (ajustable a la duración real 
 
 | Grupo   | Historias                                                                         |
 | ------- | --------------------------------------------------------------------------------- |
-| Grupo 1 | M1-08 Integración Mercado Pago, M1-07 Registro de mermas, M1-03 Eliminar producto |
+| Grupo 1 | M1-07 Registro de mermas, M1-03 Eliminar producto                                 |
 | Grupo 2 | M2-04 Anulación de ventas, M3-02 Ventas del día, M3-03 Productos más vendidos     |
 
-**Entregable:** venta completa con pago real vía Mercado Pago, informes básicos disponibles.
+**Entregable:** venta completa con registro de pago en efectivo e informes básicos disponibles.
 
 ---
 

@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { useData } from "../../../context/DataContext";
 
 export default function StockCriticoPage() {
   const { productos, categorias } = useData();
+  const [categoria, setCategoria] = useState("todas");
   const nombreCategoria = (categoriaId) =>
     categorias.find((c) => c.id === categoriaId)?.nombre ?? "Sin categoría";
   const productosCriticos = productos
-    .filter((p) => p.activo && p.stock <= p.stockCritico)
+    .filter(
+      (p) => p.activo && p.stock <= p.stockCritico && (categoria === "todas" || p.categoriaId === categoria)
+    )
     .sort((a, b) => a.stock - b.stock);
 
   return (
@@ -14,6 +18,22 @@ export default function StockCriticoPage() {
       <p className="mt-1 text-sm text-ink-500">
         Productos activos cuyo stock actual está en o bajo el mínimo definido.
       </p>
+
+      <label className="mt-3 block text-sm text-ink-600">
+        Categoría
+        <select
+          value={categoria}
+          onChange={(e) => setCategoria(e.target.value)}
+          className="mt-1 block w-full rounded-lg border border-ink-300 bg-white px-3 py-2 text-sm"
+        >
+          <option value="todas">Todas las categorías</option>
+          {categorias.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.nombre}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
         {productosCriticos.length === 0

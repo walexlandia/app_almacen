@@ -10,7 +10,6 @@ import ProductListPage from "./pages/admin/ProductListPage";
 import ProductFormPage from "./pages/admin/ProductFormPage";
 import MermasPage from "./pages/admin/MermasPage";
 import UsersPage from "./pages/admin/UsersPage";
-import MercadoPagoConfigPage from "./pages/admin/MercadoPagoConfigPage";
 import ReportsPage from "./pages/admin/ReportsPage";
 import ProfilePage from "./pages/ProfilePage";
 import SalePage from "./pages/ventas/SalePage";
@@ -40,7 +39,6 @@ export default function App() {
           <Route path="/admin/mantenedor/productos/:id" element={<ProductFormPage />} />
           <Route path="/admin/mantenedor/mermas" element={<MermasPage />} />
           <Route path="/admin/mantenedor/usuarios" element={<UsersPage />} />
-          <Route path="/admin/mantenedor/mercado-pago" element={<MercadoPagoConfigPage />} />
         </Route>
 
         <Route element={<AuthenticatedLayout />}>

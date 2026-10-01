@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Package, AlertTriangle, PackageMinus, Users, CreditCard, ChevronRight } from "lucide-react";
+import { Package, AlertTriangle, PackageMinus, Users, ChevronRight } from "lucide-react";
 import { useData } from "../../context/DataContext";
 import TopBar from "../../components/layout/TopBar";
 import Badge from "../../components/ui/Badge";
@@ -33,12 +33,6 @@ export default function MantenedorPage() {
       label: "Usuarios",
       desc: "Crear y administrar accesos del equipo",
       icon: Users,
-    },
-    {
-      to: "/admin/mantenedor/mercado-pago",
-      label: "Mercado Pago",
-      desc: "Medio de pago del negocio",
-      icon: CreditCard,
     },
   ];
 

@@ -6,7 +6,7 @@ Ver el detalle funcional completo en [`backlog-plan-trabajo-app-inventario.md`](
 
 ## Estado actual
 
-Etapa de **diseño de interfaz sin datos reales**: todas las pantallas están construidas y navegables con datos de ejemplo (`src/data/mockData.js`). Aún no hay conexión a Supabase ni integraciones reales (lector de código de barra, Mercado Pago) — esos quedan para las ramas `feature/*` correspondientes.
+Etapa funcional local: las pantallas trabajan con persistencia en el navegador y el lector de códigos usa la cámara mediante ZXing. La conexión definitiva con Supabase queda pendiente.
 
 ## Stack técnico
 
@@ -45,16 +45,16 @@ src/
   data/         mockData.js — productos, ventas, mermas, usuarios de ejemplo
   pages/
     auth/       Login
-    admin/      Dashboard, Productos (listado/alta/edición), Mermas, Usuarios, Informes, Más, Mercado Pago
+    admin/      Dashboard, Productos (listado/alta/edición), Mermas, Usuarios e Informes
     ventas/     Venta (escaneo + carrito), Cobro/checkout, Historial de ventas (anulación)
 ```
 
 ## Accesos de prueba (login simulado)
 
-| Rol           | Correo                | Notas                                                             |
-| ------------- | --------------------- | ----------------------------------------------------------------- |
-| Administrador | `admin@almacen.cl`    | Ve Dashboard, Productos, Informes, Usuarios, Mermas, Mercado Pago |
-| Vendedor      | `vendedor@almacen.cl` | Ve Venta (escaneo/carrito) e Historial de ventas                  |
+| Rol           | Correo                | Notas                                                |
+| ------------- | --------------------- | ---------------------------------------------------- |
+| Administrador | `admin@almacen.cl`    | Ve Dashboard, Productos, Informes, Usuarios y Mermas |
+| Vendedor      | `vendedor@almacen.cl` | Ve Venta (escaneo/carrito) e Historial de ventas     |
 
 Cualquier contraseña de 4+ caracteres funciona (login mockeado en `AuthContext`, sin backend aún).
 
@@ -68,7 +68,6 @@ main                → versión estable / lista para generar APK
       ├── feature/login-auth
       ├── feature/setup-bd
       ├── feature/modulo1-mantenedores
-      ├── feature/modulo1-mercadopago
       ├── feature/modulo2-ventas
       ├── feature/modulo2-lector-codigo
       └── feature/modulo3-informes
