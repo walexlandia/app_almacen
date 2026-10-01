@@ -1,17 +1,18 @@
 import { Link } from "react-router-dom";
 import { AlertTriangle, TrendingUp, Receipt, ChevronRight } from "lucide-react";
-import { productos, ventas, calcularTotalVenta, formatoCLP } from "../../data/mockData";
+import { calcularTotalVenta, formatoCLP } from "../../data/mockData";
+import { useData } from "../../context/DataContext";
 import { useAuth } from "../../context/AuthContext";
 import StatCard from "../../components/ui/StatCard";
 import Badge from "../../components/ui/Badge";
 
-const hoy = "2026-08-19";
-
 export default function DashboardPage() {
   const { usuario } = useAuth();
-  const ventasHoy = ventas.filter((v) => v.fecha.startsWith(hoy) && v.estado === "completada");
+  const { productos, ventas } = useData();
+  const fechaHoy = new Date().toISOString().slice(0, 10);
+  const ventasHoy = ventas.filter((v) => v.fecha.startsWith(fechaHoy) && v.estado === "completada");
   const totalHoy = ventasHoy.reduce((acc, v) => acc + calcularTotalVenta(v), 0);
-  const critico = productos.filter((p) => p.stock <= p.stockCritico);
+  const critico = productos.filter((p) => p.activo && p.stock <= p.stockCritico);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -41,7 +42,10 @@ export default function DashboardPage() {
           <section>
             <div className="mb-2 flex items-center justify-between">
               <h2 className="text-[15px] font-semibold text-ink-900">Alertas de stock crítico</h2>
-              <Link to="/admin/mantenedor/productos?filtro=critico" className="text-sm font-medium text-brand-600">
+              <Link
+                to="/admin/mantenedor/productos?filtro=critico"
+                className="text-sm font-medium text-brand-600"
+              >
                 Ver todo
               </Link>
             </div>

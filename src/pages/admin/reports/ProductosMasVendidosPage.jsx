@@ -1,6 +1,7 @@
-import { ventas, productos, formatoCLP } from "../../../data/mockData";
+import { formatoCLP } from "../../../data/mockData";
+import { useData } from "../../../context/DataContext";
 
-function calcularRanking() {
+function calcularRanking(ventas, productos) {
   const acumulado = {};
 
   ventas
@@ -25,14 +26,13 @@ function calcularRanking() {
 }
 
 export default function ProductosMasVendidosPage() {
-  const ranking = calcularRanking();
+  const { ventas, productos } = useData();
+  const ranking = calcularRanking(ventas, productos);
 
   return (
     <div className="p-4 pb-24">
       <h1 className="text-xl font-semibold text-ink-900">Productos más vendidos</h1>
-      <p className="mt-1 text-sm text-ink-500">
-        Basado en las ventas completadas (excluye ventas anuladas).
-      </p>
+      <p className="mt-1 text-sm text-ink-500">Basado en las ventas completadas (excluye ventas anuladas).</p>
 
       {ranking.length === 0 ? (
         <p className="mt-6 text-center text-sm text-ink-400">Aún no hay ventas registradas.</p>

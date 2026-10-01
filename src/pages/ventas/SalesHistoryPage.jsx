@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { Receipt, XCircle } from "lucide-react";
-import {
-  ventas as ventasIniciales,
-  calcularTotalVenta,
-  productoNombre,
-  formatoCLP,
-} from "../../data/mockData";
+import { calcularTotalVenta, formatoCLP } from "../../data/mockData";
+import { useData } from "../../context/DataContext";
 import TopBar from "../../components/layout/TopBar";
 import Badge from "../../components/ui/Badge";
 import Sheet from "../../components/ui/Sheet";
@@ -13,18 +9,12 @@ import Button from "../../components/ui/Button";
 import Field, { inputClass } from "../../components/ui/Field";
 
 export default function SalesHistoryPage() {
-  const [ventas, setVentas] = useState(ventasIniciales);
+  const { ventas, anularVenta, productoNombre } = useData();
   const [seleccionada, setSeleccionada] = useState(null);
   const [motivo, setMotivo] = useState("");
 
   const anular = () => {
-    setVentas((prev) =>
-      prev.map((v) =>
-        v.id === seleccionada.id
-          ? { ...v, estado: "anulada", motivoAnulacion: motivo || "Sin motivo especificado" }
-          : v
-      )
-    );
+    anularVenta(seleccionada.id, motivo);
     setSeleccionada(null);
     setMotivo("");
   };

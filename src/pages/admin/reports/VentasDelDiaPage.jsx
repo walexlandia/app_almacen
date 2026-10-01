@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { ventas, calcularTotalVenta, formatoCLP } from "../../../data/mockData";
+import { calcularTotalVenta, formatoCLP } from "../../../data/mockData";
+import { useData } from "../../../context/DataContext";
 
 const hoyISO = () => new Date().toISOString().slice(0, 10);
 
 export default function VentasDelDiaPage() {
+  const { ventas } = useData();
   const [fecha, setFecha] = useState(hoyISO());
 
   const ventasDelDia = ventas.filter((v) => v.fecha.slice(0, 10) === fecha);
@@ -41,9 +43,7 @@ export default function VentasDelDiaPage() {
       </div>
 
       {ventasDelDia.length === 0 ? (
-        <p className="mt-6 text-center text-sm text-ink-400">
-          No hay ventas registradas para esta fecha.
-        </p>
+        <p className="mt-6 text-center text-sm text-ink-400">No hay ventas registradas para esta fecha.</p>
       ) : (
         <ul className="mt-4 divide-y divide-ink-200 rounded-lg border border-ink-200 bg-white">
           {ventasDelDia.map((v) => (

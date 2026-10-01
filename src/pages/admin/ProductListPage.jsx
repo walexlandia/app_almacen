@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Search, Plus, AlertTriangle, ScanLine } from "lucide-react";
-import { productos as productosIniciales, categorias, formatoCLP } from "../../data/mockData";
+import { formatoCLP } from "../../data/mockData";
+import { useData } from "../../context/DataContext";
 import TopBar from "../../components/layout/TopBar";
 import Badge from "../../components/ui/Badge";
 import EmptyState from "../../components/ui/EmptyState";
@@ -13,7 +14,8 @@ export default function ProductListPage() {
   const [busqueda, setBusqueda] = useState("");
   const [categoria, setCategoria] = useState("todas");
 
-  const productos = productosIniciales; // diseño: catálogo mock, sin escritura real
+  const { productos: todosLosProductos, categorias } = useData();
+  const productos = todosLosProductos.filter((p) => p.activo);
 
   const filtrados = useMemo(() => {
     return productos.filter((p) => {

@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ScanLine, Search, Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
-import { productos, formatoCLP } from "../../data/mockData";
+import { formatoCLP } from "../../data/mockData";
+import { useData } from "../../context/DataContext";
 import { useCart } from "../../context/CartContext";
 import Button from "../../components/ui/Button";
 import EmptyState from "../../components/ui/EmptyState";
@@ -9,17 +10,19 @@ import BarcodeScannerSheet from "../../components/ui/BarcodeScannerSheet";
 
 export default function SalePage() {
   const navigate = useNavigate();
+  const { productos: todosLosProductos } = useData();
+  const productos = todosLosProductos.filter((p) => p.activo);
   const { items, agregarProducto, quitarUnidad, eliminarProducto, total, cantidadItems } = useCart();
   const [scannerAbierto, setScannerAbierto] = useState(false);
   const [busqueda, setBusqueda] = useState("");
 
-  const resultados = useMemo(() => {
+  const resultados = (() => {
     if (!busqueda.trim()) return [];
     const q = busqueda.toLowerCase();
     return productos
       .filter((p) => p.nombre.toLowerCase().includes(q) || p.codigoBarra.includes(q))
       .slice(0, 5);
-  }, [busqueda]);
+  })();
 
   const handleDetectado = (codigo) => {
     const producto = productos.find((p) => p.codigoBarra === codigo);

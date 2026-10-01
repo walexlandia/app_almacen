@@ -1,9 +1,9 @@
-import { productos, categorias } from "../../../data/mockData";
-
-const nombreCategoria = (categoriaId) =>
-  categorias.find((c) => c.id === categoriaId)?.nombre ?? "Sin categoría";
+import { useData } from "../../../context/DataContext";
 
 export default function StockCriticoPage() {
+  const { productos, categorias } = useData();
+  const nombreCategoria = (categoriaId) =>
+    categorias.find((c) => c.id === categoriaId)?.nombre ?? "Sin categoría";
   const productosCriticos = productos
     .filter((p) => p.activo && p.stock <= p.stockCritico)
     .sort((a, b) => a.stock - b.stock);

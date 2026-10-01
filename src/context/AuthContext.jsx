@@ -1,5 +1,5 @@
-import { createContext, useContext, useMemo, useState } from "react";
-import { usuarios } from "../data/mockData";
+import { createContext, useContext, useState } from "react";
+import { useData } from "./DataContext";
 
 // Autenticación simulada: en esta etapa de diseño no hay Supabase conectado.
 // E0-05 se resolverá con Supabase Auth; aquí solo se valida contra el mock.
@@ -8,6 +8,7 @@ const AuthContext = createContext(null);
 const STORAGE_KEY = "almacen.sesion";
 
 export function AuthProvider({ children }) {
+  const { usuarios } = useData();
   const [usuario, setUsuario] = useState(() => {
     const guardado = sessionStorage.getItem(STORAGE_KEY);
     return guardado ? JSON.parse(guardado) : null;
@@ -41,10 +42,7 @@ export function AuthProvider({ children }) {
     sessionStorage.removeItem(STORAGE_KEY);
   };
 
-  const value = useMemo(
-    () => ({ usuario, login, logout, error, esAdmin: usuario?.rol === "admin" }),
-    [usuario, error]
-  );
+  const value = { usuario, login, logout, error, esAdmin: usuario?.rol === "admin" };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

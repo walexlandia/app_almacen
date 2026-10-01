@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ScanLine, Trash2, Check } from "lucide-react";
-import { productos, categorias } from "../../data/mockData";
+import { useData } from "../../context/DataContext";
 import TopBar from "../../components/layout/TopBar";
 import Field, { inputClass } from "../../components/ui/Field";
 import Button from "../../components/ui/Button";
@@ -12,8 +12,9 @@ export default function ProductFormPage() {
   const { id } = useParams();
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const { productos, categorias, guardarProducto, darBajaProducto } = useData();
   const esEdicion = Boolean(id);
-  const productoExistente = useMemo(() => productos.find((p) => p.id === id), [id]);
+  const productoExistente = productos.find((p) => p.id === id);
 
   const [form, setForm] = useState({
     nombre: productoExistente?.nombre ?? "",
@@ -26,14 +27,20 @@ export default function ProductFormPage() {
   const [scannerAbierto, setScannerAbierto] = useState(params.get("scan") === "1");
   const [confirmarBaja, setConfirmarBaja] = useState(false);
   const [guardado, setGuardado] = useState(false);
+  const [error, setError] = useState("");
 
   const set = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.value }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Diseño sin datos: no persiste, solo confirma visualmente el flujo.
-    setGuardado(true);
-    setTimeout(() => navigate("/admin/mantenedor/productos"), 900);
+    setError("");
+    try {
+      guardarProducto(form, id);
+      setGuardado(true);
+      setTimeout(() => navigate("/admin/mantenedor/productos"), 500);
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -121,6 +128,8 @@ export default function ProductFormPage() {
           />
         </Field>
 
+        {error && <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+
         {esEdicion && (
           <p className="text-xs text-ink-400">
             Stock actual:{" "}
@@ -163,6 +172,7 @@ export default function ProductFormPage() {
             variant="danger"
             className="flex-1"
             onClick={() => {
+              darBajaProducto(id);
               setConfirmarBaja(false);
               navigate("/admin/mantenedor/productos");
             }}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PackageMinus, Check } from "lucide-react";
-import { productos, mermas, productoNombre } from "../../data/mockData";
+import { useData } from "../../context/DataContext";
+import { useAuth } from "../../context/AuthContext";
 import TopBar from "../../components/layout/TopBar";
 import Field, { inputClass } from "../../components/ui/Field";
 import Button from "../../components/ui/Button";
@@ -15,20 +16,30 @@ const motivos = [
 ];
 
 export default function MermasPage() {
+  const { productos: todosLosProductos, mermas, productoNombre, registrarMerma } = useData();
+  const { usuario } = useAuth();
+  const productos = todosLosProductos.filter((p) => p.activo);
   const [tab, setTab] = useState("registrar");
   const [productoId, setProductoId] = useState(productos[0].id);
   const [cantidad, setCantidad] = useState("");
   const [motivo, setMotivo] = useState(motivos[0].id);
   const [guardado, setGuardado] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setGuardado(true);
-    setTimeout(() => {
-      setGuardado(false);
-      setCantidad("");
-      setTab("historial");
-    }, 800);
+    setError("");
+    try {
+      registrarMerma({ productoId, cantidad, motivo, usuario: usuario.nombre });
+      setGuardado(true);
+      setTimeout(() => {
+        setGuardado(false);
+        setCantidad("");
+        setTab("historial");
+      }, 500);
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -102,6 +113,8 @@ export default function MermasPage() {
           <p className="text-xs text-ink-400">
             La cantidad se descuenta automáticamente del stock del producto al guardar.
           </p>
+
+          {error && <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
 
           <Button
             type="submit"

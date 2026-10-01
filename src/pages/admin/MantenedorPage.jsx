@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import { Package, AlertTriangle, PackageMinus, Users, CreditCard, ChevronRight } from "lucide-react";
-import { productos } from "../../data/mockData";
+import { useData } from "../../context/DataContext";
 import TopBar from "../../components/layout/TopBar";
 import Badge from "../../components/ui/Badge";
 
 export default function MantenedorPage() {
-  const critico = productos.filter((p) => p.stock <= p.stockCritico);
+  const { productos } = useData();
+  const critico = productos.filter((p) => p.activo && p.stock <= p.stockCritico);
 
   const opciones = [
     {

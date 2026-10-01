@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { UserPlus, Shield, ShieldCheck } from "lucide-react";
-import { usuarios } from "../../data/mockData";
+import { useData } from "../../context/DataContext";
 import TopBar from "../../components/layout/TopBar";
 import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
@@ -8,16 +8,20 @@ import Sheet from "../../components/ui/Sheet";
 import Field, { inputClass } from "../../components/ui/Field";
 
 export default function UsersPage() {
+  const { usuarios, guardarUsuario } = useData();
   const [sheetAbierto, setSheetAbierto] = useState(false);
   const [editando, setEditando] = useState(null);
+  const [error, setError] = useState("");
 
   const abrirNuevo = () => {
     setEditando(null);
+    setError("");
     setSheetAbierto(true);
   };
 
   const abrirEditar = (u) => {
     setEditando(u);
+    setError("");
     setSheetAbierto(true);
   };
 
@@ -71,13 +75,28 @@ export default function UsersPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            setSheetAbierto(false);
+            const form = new FormData(e.currentTarget);
+            try {
+              guardarUsuario(
+                {
+                  nombre: form.get("nombre"),
+                  correo: form.get("correo"),
+                  rol: form.get("rol"),
+                  activo: editando ? form.get("activo") === "on" : true,
+                },
+                editando?.id
+              );
+              setSheetAbierto(false);
+            } catch (err) {
+              setError(err.message);
+            }
           }}
           className="flex flex-col gap-4"
         >
           <Field label="Nombre completo">
             <input
               required
+              name="nombre"
               defaultValue={editando?.nombre}
               placeholder="Nombre y apellido"
               className={inputClass(false)}
@@ -86,6 +105,7 @@ export default function UsersPage() {
           <Field label="Correo electrónico">
             <input
               required
+              name="correo"
               type="email"
               defaultValue={editando?.correo}
               placeholder="correo@almacen.cl"
@@ -93,7 +113,7 @@ export default function UsersPage() {
             />
           </Field>
           <Field label="Rol">
-            <select defaultValue={editando?.rol ?? "vendedor"} className={inputClass(false)}>
+            <select name="rol" defaultValue={editando?.rol ?? "vendedor"} className={inputClass(false)}>
               <option value="vendedor">Vendedor</option>
               <option value="admin">Administrador</option>
             </select>
@@ -101,9 +121,15 @@ export default function UsersPage() {
           {editando && (
             <label className="flex items-center justify-between rounded-xl border border-ink-200 px-3.5 py-3">
               <span className="text-sm font-medium text-ink-700">Cuenta activa</span>
-              <input type="checkbox" defaultChecked={editando.activo} className="size-5 accent-brand-500" />
+              <input
+                name="activo"
+                type="checkbox"
+                defaultChecked={editando.activo}
+                className="size-5 accent-brand-500"
+              />
             </label>
           )}
+          {error && <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
           <Button type="submit" size="lg" className="mt-2">
             {editando ? "Guardar cambios" : "Crear usuario"}
           </Button>

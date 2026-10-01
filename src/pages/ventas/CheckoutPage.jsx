@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { Banknote, CreditCard, CheckCircle2 } from "lucide-react";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
+import { useData } from "../../context/DataContext";
 import { formatoCLP } from "../../data/mockData";
 import TopBar from "../../components/layout/TopBar";
 import Button from "../../components/ui/Button";
@@ -13,15 +15,31 @@ const metodos = [
 
 export default function CheckoutPage() {
   const { items, total, vaciarCarrito } = useCart();
+  const { usuario } = useAuth();
+  const { registrarVenta } = useData();
   const navigate = useNavigate();
   const [metodo, setMetodo] = useState("mercadopago");
   const [estado, setEstado] = useState("pendiente"); // pendiente | procesando | listo
+  const [error, setError] = useState("");
 
   if (items.length === 0 && estado !== "listo") return <Navigate to="/venta" replace />;
 
   const confirmar = () => {
+    setError("");
     setEstado("procesando");
-    setTimeout(() => setEstado("listo"), 1200);
+    setTimeout(() => {
+      try {
+        registrarVenta({
+          items,
+          vendedor: usuario.nombre,
+          metodoPago: metodos.find((m) => m.id === metodo)?.label,
+        });
+        setEstado("listo");
+      } catch (err) {
+        setError(err.message);
+        setEstado("pendiente");
+      }
+    }, 500);
   };
 
   const finalizar = () => {
@@ -85,6 +103,8 @@ export default function CheckoutPage() {
             <code className="rounded bg-ink-100 px-1 py-0.5">feature/modulo1-mercadopago</code>).
           </p>
         )}
+
+        {error && <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
 
         <Button size="lg" className="mt-auto w-full" onClick={confirmar} disabled={estado === "procesando"}>
           {estado === "procesando" ? "Procesando pago..." : "Confirmar cobro"}
