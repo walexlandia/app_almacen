@@ -23,6 +23,11 @@ export default function BarcodeScannerSheet({ open, onClose, onDetectado }) {
   const streamRef = useRef(null);
   const controlsRef = useRef(null);
   const detectadoRef = useRef(false);
+  const onDetectadoRef = useRef(onDetectado);
+
+  useEffect(() => {
+    onDetectadoRef.current = onDetectado;
+  }, [onDetectado]);
 
   useEffect(() => {
     if (!open) return;
@@ -34,6 +39,10 @@ export default function BarcodeScannerSheet({ open, onClose, onDetectado }) {
     setErrorMsg("");
     setManual("");
     setLinterna(false);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open || modo !== "camara") return;
 
     let cancelado = false;
     const reader = new BrowserMultiFormatReader();
@@ -54,7 +63,7 @@ export default function BarcodeScannerSheet({ open, onClose, onDetectado }) {
               const texto = resultado.getText();
               if (navigator.vibrate) navigator.vibrate(80);
               controlsRef.current?.stop();
-              onDetectado(texto);
+              onDetectadoRef.current(texto);
             } else if (error && !(error instanceof NotFoundException)) {
               // Errores de decodificación frame a frame se ignoran; solo
               // interesan fallas reales de cámara (manejadas en el catch).
@@ -78,7 +87,9 @@ export default function BarcodeScannerSheet({ open, onClose, onDetectado }) {
         if (cancelado) return;
         setEstado("error");
         if (err?.name === "NotAllowedError") {
-          setErrorMsg("Permiso de cámara denegado. Actívalo en los ajustes del dispositivo o ingresa el código manualmente.");
+          setErrorMsg(
+            "Permiso de cámara denegado. Actívalo en los ajustes del dispositivo o ingresa el código manualmente."
+          );
         } else if (err?.name === "NotFoundError" || err?.name === "OverconstrainedError") {
           setErrorMsg("No se encontró una cámara disponible en este dispositivo.");
         } else {
@@ -101,7 +112,7 @@ export default function BarcodeScannerSheet({ open, onClose, onDetectado }) {
       controlsRef.current = null;
       streamRef.current = null;
     };
-  }, [open, onDetectado]);
+  }, [open, modo]);
 
   const alternarLinterna = async () => {
     const track = streamRef.current?.getVideoTracks?.()[0];
@@ -147,13 +158,7 @@ export default function BarcodeScannerSheet({ open, onClose, onDetectado }) {
         {modo === "camara" && (
           <div className="flex flex-col gap-3">
             <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl bg-ink-900">
-              <video
-                ref={videoRef}
-                className="h-full w-full object-cover"
-                muted
-                playsInline
-                autoPlay
-              />
+              <video ref={videoRef} className="h-full w-full object-cover" muted playsInline autoPlay />
               {estado !== "error" && (
                 <>
                   <div className="pointer-events-none absolute inset-8 rounded-xl border-2 border-white/70" />
@@ -188,7 +193,12 @@ export default function BarcodeScannerSheet({ open, onClose, onDetectado }) {
                   : "No se pudo usar la cámara"}
             </p>
             {estado === "error" && (
-              <Button variant="secondary" icon={RefreshCcw} onClick={() => setModo("camara")} className="w-full">
+              <Button
+                variant="secondary"
+                icon={RefreshCcw}
+                onClick={() => setModo("camara")}
+                className="w-full"
+              >
                 Reintentar
               </Button>
             )}
@@ -227,5 +237,3 @@ export default function BarcodeScannerSheet({ open, onClose, onDetectado }) {
     </Sheet>
   );
 }
-
-// prueba para git 
