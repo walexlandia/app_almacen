@@ -19,7 +19,7 @@ export default function ProductFormPage() {
   const [form, setForm] = useState({
     nombre: productoExistente?.nombre ?? "",
     codigoBarra: productoExistente?.codigoBarra ?? "",
-    categoriaId: productoExistente?.categoriaId ?? categorias[0].id,
+    categoriaId: productoExistente?.categoriaId ?? categorias[0]?.id ?? "",
     precio: productoExistente?.precio ?? "",
     cantidad: esEdicion ? "" : "",
     stockCritico: productoExistente?.stockCritico ?? "",
@@ -31,11 +31,11 @@ export default function ProductFormPage() {
 
   const set = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
-      guardarProducto(form, id);
+      await guardarProducto(form, id);
       setGuardado(true);
       setTimeout(() => navigate("/admin/mantenedor/productos"), 500);
     } catch (err) {
@@ -171,8 +171,8 @@ export default function ProductFormPage() {
           <Button
             variant="danger"
             className="flex-1"
-            onClick={() => {
-              darBajaProducto(id);
+            onClick={async () => {
+              await darBajaProducto(id);
               setConfirmarBaja(false);
               navigate("/admin/mantenedor/productos");
             }}

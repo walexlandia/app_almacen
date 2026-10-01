@@ -1,7 +1,7 @@
 # Pruebas funcionales contra el backlog
 
 Fecha de ejecución: 1 de octubre de 2026  
-Entorno: desarrollo local, Vite, navegador integrado y persistencia `localStorage`.
+Entorno: desarrollo local, Vite, navegador integrado y Supabase remoto.
 
 ## Alcance
 
@@ -13,9 +13,9 @@ La historia M1-08, correspondiente a pagos externos, fue retirada del backlog po
 | --- | --- | --- |
 | E0-01 | Cumple | Instalación existente, estructura React/Vite, ESLint, Prettier, README; `lint` y `build` correctos. |
 | E0-02 | Parcial | Existen `main`, `develop` y plantilla de PR. Las reglas remotas de protección no se verificaron en esta ejecución local. |
-| E0-03 | Pendiente | Los módulos persisten en `localStorage`; aún falta crear/conectar el modelo de Supabase. |
+| E0-03 | Cumple | El esquema remoto contiene categorías, productos, usuarios, ventas, detalle y mermas, con relaciones, RLS y migraciones versionadas. |
 | E0-04 | No verificable localmente | El tablero Trello es externo a la aplicación. |
-| E0-05 | Parcial | Login, cierre de sesión, rol y redirección admin/vendedor funcionan. La autenticación todavía es simulada, no Supabase Auth. |
+| E0-05 | Cumple | Login, sesión persistente, cierre de sesión, perfiles y roles utilizan Supabase Auth. |
 | M1-01 | Cumple localmente | Se creó “Producto QA” con código `9990001112223`, precio, categoría, cantidad 7 y mínimo 3. |
 | M1-02 | Cumple localmente | Se editó a “Producto QA Editado” y se ingresaron 2 unidades, quedando stock 9. |
 | M1-03 | Implementado, no ejecutado | Existe baja lógica con confirmación. No se eliminó información durante esta prueba. |
@@ -41,7 +41,13 @@ La historia M1-08, correspondiente a pagos externos, fue retirada del backlog po
 
 ## Pendientes antes de producción
 
-1. Conectar tablas, políticas RLS y autenticación de Supabase.
-2. Validar el escaneo con cámara en un teléfono real y bajo HTTPS.
-3. Ejecutar una prueba específica de baja lógica con datos desechables.
-4. Verificar configuración remota de GitHub y Trello.
+1. Validar el escaneo con cámara en un teléfono real y bajo HTTPS.
+2. Ejecutar una prueba específica de baja lógica con datos desechables.
+3. Verificar configuración remota de GitHub y Trello.
+
+## Validación Supabase — 1 de octubre de 2026
+
+- Login real confirmado para `admin@almacen.cl`.
+- Perfil obtenido bajo RLS: Marcela Rojas, rol administrador, activo.
+- Lectura remota confirmada: 12 productos y 6 categorías.
+- Venta transaccional creada y anulada correctamente; stock restaurado de 34 a 34.

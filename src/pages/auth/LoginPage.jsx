@@ -15,14 +15,12 @@ export default function LoginPage() {
 
   if (usuario) return <Navigate to={esAdmin ? "/admin" : "/venta"} replace />;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setCargando(true);
-    setTimeout(() => {
-      const ok = login(correo, clave);
-      setCargando(false);
-      if (ok) navigate("/", { replace: true });
-    }, 400);
+    const ok = await login(correo, clave);
+    setCargando(false);
+    if (ok) navigate("/", { replace: true });
   };
 
   const usarDemo = (correoDemo) => {
@@ -93,7 +91,7 @@ export default function LoginPage() {
 
       <div className="mt-8 rounded-2xl border border-dashed border-ink-200 p-4">
         <p className="mb-2.5 text-xs font-medium uppercase tracking-wide text-ink-400">
-          Accesos de prueba (diseño sin conexión a datos reales)
+          Accesos de prueba en Supabase
         </p>
         <div className="flex flex-col gap-2">
           <button

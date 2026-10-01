@@ -13,10 +13,14 @@ export default function SalesHistoryPage() {
   const [seleccionada, setSeleccionada] = useState(null);
   const [motivo, setMotivo] = useState("");
 
-  const anular = () => {
-    anularVenta(seleccionada.id, motivo);
-    setSeleccionada(null);
-    setMotivo("");
+  const anular = async () => {
+    try {
+      await anularVenta(seleccionada.id, motivo);
+      setSeleccionada(null);
+      setMotivo("");
+    } catch (err) {
+      setMotivo(err.message);
+    }
   };
 
   return (

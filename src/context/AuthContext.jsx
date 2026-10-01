@@ -1,49 +1,62 @@
-import { createContext, useContext, useState } from "react";
-import { useData } from "./DataContext";
+import { createContext, useContext, useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
 
-// Autenticación simulada: en esta etapa de diseño no hay Supabase conectado.
-// E0-05 se resolverá con Supabase Auth; aquí solo se valida contra el mock.
 const AuthContext = createContext(null);
 
-const STORAGE_KEY = "almacen.sesion";
-
 export function AuthProvider({ children }) {
-  const { usuarios } = useData();
-  const [usuario, setUsuario] = useState(() => {
-    const guardado = sessionStorage.getItem(STORAGE_KEY);
-    return guardado ? JSON.parse(guardado) : null;
-  });
+  const [usuario, setUsuario] = useState(null);
+  const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
-  const login = (correo, clave) => {
+  const cargarPerfil = async (authUser) => {
+    if (!authUser) {
+      setUsuario(null);
+      setCargando(false);
+      return;
+    }
+    const { data, error: perfilError } = await supabase
+      .from("usuarios")
+      .select("id,nombre,correo,rol,activo")
+      .eq("id", authUser.id)
+      .single();
+    if (perfilError || !data?.activo) {
+      await supabase.auth.signOut();
+      setUsuario(null);
+      setError(perfilError ? "No fue posible cargar el perfil." : "La cuenta está desactivada.");
+    } else {
+      setUsuario(data);
+    }
+    setCargando(false);
+  };
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => cargarPerfil(data.session?.user));
+    const { data } = supabase.auth.onAuthStateChange((_evento, sesion) => {
+      setTimeout(() => cargarPerfil(sesion?.user), 0);
+    });
+    return () => data.subscription.unsubscribe();
+  }, []);
+
+  const login = async (correo, clave) => {
     setError("");
-    const encontrado = usuarios.find((u) => u.correo.toLowerCase() === correo.trim().toLowerCase());
-
-    if (!encontrado) {
-      setError("No existe una cuenta con ese correo.");
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email: correo.trim().toLowerCase(),
+      password: clave,
+    });
+    if (authError) {
+      setError("Correo o contraseña incorrectos.");
       return false;
     }
-    if (!encontrado.activo) {
-      setError("Este usuario está desactivado. Contacta al administrador.");
-      return false;
-    }
-    if (clave.length < 4) {
-      setError("Contraseña incorrecta.");
-      return false;
-    }
-
-    setUsuario(encontrado);
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(encontrado));
+    await cargarPerfil(data.user);
     return true;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await supabase.auth.signOut();
     setUsuario(null);
-    sessionStorage.removeItem(STORAGE_KEY);
   };
 
-  const value = { usuario, login, logout, error, esAdmin: usuario?.rol === "admin" };
-
+  const value = { usuario, login, logout, error, cargando, esAdmin: usuario?.rol === "admin" };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

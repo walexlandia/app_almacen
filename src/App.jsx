@@ -17,7 +17,8 @@ import CheckoutPage from "./pages/ventas/CheckoutPage";
 import SalesHistoryPage from "./pages/ventas/SalesHistoryPage";
 
 function Home() {
-  const { usuario, esAdmin } = useAuth();
+  const { usuario, esAdmin, cargando } = useAuth();
+  if (cargando) return <div className="m-auto text-sm text-ink-400">Cargando sesión...</div>;
   if (!usuario) return <Navigate to="/login" replace />;
   return <Navigate to={esAdmin ? "/admin" : "/venta"} replace />;
 }

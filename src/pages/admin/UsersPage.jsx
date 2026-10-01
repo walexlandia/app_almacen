@@ -73,16 +73,17 @@ export default function UsersPage() {
         title={editando ? "Editar usuario" : "Nuevo usuario"}
       >
         <form
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
             const form = new FormData(e.currentTarget);
             try {
-              guardarUsuario(
+              await guardarUsuario(
                 {
                   nombre: form.get("nombre"),
                   correo: form.get("correo"),
                   rol: form.get("rol"),
                   activo: editando ? form.get("activo") === "on" : true,
+                  clave: form.get("clave"),
                 },
                 editando?.id
               );
@@ -118,6 +119,11 @@ export default function UsersPage() {
               <option value="admin">Administrador</option>
             </select>
           </Field>
+          {!editando && (
+            <Field label="Contraseña temporal" hint="Mínimo 8 caracteres.">
+              <input required name="clave" type="password" minLength="8" className={inputClass(false)} />
+            </Field>
+          )}
           {editando && (
             <label className="flex items-center justify-between rounded-xl border border-ink-200 px-3.5 py-3">
               <span className="text-sm font-medium text-ink-700">Cuenta activa</span>

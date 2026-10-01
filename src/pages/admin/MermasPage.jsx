@@ -20,17 +20,17 @@ export default function MermasPage() {
   const { usuario } = useAuth();
   const productos = todosLosProductos.filter((p) => p.activo);
   const [tab, setTab] = useState("registrar");
-  const [productoId, setProductoId] = useState(productos[0].id);
+  const [productoId, setProductoId] = useState(productos[0]?.id ?? "");
   const [cantidad, setCantidad] = useState("");
   const [motivo, setMotivo] = useState(motivos[0].id);
   const [guardado, setGuardado] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
-      registrarMerma({ productoId, cantidad, motivo, usuario: usuario.nombre });
+      await registrarMerma({ productoId, cantidad, motivo, usuario: usuario.nombre });
       setGuardado(true);
       setTimeout(() => {
         setGuardado(false);

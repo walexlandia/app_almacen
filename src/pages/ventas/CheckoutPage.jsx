@@ -21,22 +21,20 @@ export default function CheckoutPage() {
 
   if (items.length === 0 && estado !== "listo") return <Navigate to="/venta" replace />;
 
-  const confirmar = () => {
+  const confirmar = async () => {
     setError("");
     setEstado("procesando");
-    setTimeout(() => {
-      try {
-        registrarVenta({
-          items,
-          vendedor: usuario.nombre,
-          metodoPago: metodos.find((m) => m.id === metodo)?.label,
-        });
-        setEstado("listo");
-      } catch (err) {
-        setError(err.message);
-        setEstado("pendiente");
-      }
-    }, 500);
+    try {
+      await registrarVenta({
+        items,
+        vendedor: usuario.nombre,
+        metodoPago: metodos.find((m) => m.id === metodo)?.label,
+      });
+      setEstado("listo");
+    } catch (err) {
+      setError(err.message);
+      setEstado("pendiente");
+    }
   };
 
   const finalizar = () => {
