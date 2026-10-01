@@ -15,6 +15,7 @@ export default function SalePage() {
   const { items, agregarProducto, quitarUnidad, eliminarProducto, total, cantidadItems } = useCart();
   const [scannerAbierto, setScannerAbierto] = useState(false);
   const [busqueda, setBusqueda] = useState("");
+  const [errorEscaneo, setErrorEscaneo] = useState("");
 
   const resultados = (() => {
     if (!busqueda.trim()) return [];
@@ -27,7 +28,16 @@ export default function SalePage() {
   const handleDetectado = (codigo) => {
     const producto = productos.find((p) => p.codigoBarra === codigo);
     setScannerAbierto(false);
-    if (producto) agregarProducto(producto);
+    if (!producto) {
+      setErrorEscaneo(`No existe un producto activo con el código ${codigo}.`);
+      return;
+    }
+    if (producto.stock < 1) {
+      setErrorEscaneo(`${producto.nombre} no tiene stock disponible.`);
+      return;
+    }
+    setErrorEscaneo("");
+    agregarProducto(producto);
   };
 
   return (
@@ -63,7 +73,7 @@ export default function SalePage() {
                 <button
                   key={p.id}
                   onClick={() => {
-                    agregarProducto(p);
+                    handleDetectado(p.codigoBarra);
                     setBusqueda("");
                   }}
                   className="flex w-full items-center justify-between px-4 py-2.5 text-left active:bg-ink-50"
@@ -78,6 +88,10 @@ export default function SalePage() {
             </div>
           )}
         </div>
+
+        {errorEscaneo && (
+          <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600">{errorEscaneo}</p>
+        )}
       </div>
 
       <div className="flex-1 px-5 py-4">

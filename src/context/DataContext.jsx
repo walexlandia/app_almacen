@@ -34,7 +34,11 @@ export function DataProvider({ children }) {
   const actualizar = (reductor) => {
     setDatos((prev) => {
       const siguiente = reductor(prev);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(siguiente));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(siguiente));
+      } catch {
+        // Mantiene la sesión funcional aunque el navegador bloquee el almacenamiento.
+      }
       return siguiente;
     });
   };
