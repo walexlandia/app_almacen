@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 supabase/.temp/
+.claude/
+_informe/
+_manual/
 
 # Capacitor / plataformas nativas generadas (se agregan en el sprint de empaquetado APK)
 android
